@@ -215,7 +215,7 @@ class PointersDomain():
         if b==PointersDomain.bottomElement:
             return a
         if a==PointersDomain.topElement or b==PointersDomain.topElement:
-            return topElement
+            return PointersDomain.topElement
         res = set()
         for i in a:
             res.insert(i)
@@ -245,9 +245,9 @@ class PointersDomain():
             # what needs to happen if it is a skip statement
             return currentState
         elif isinstance(block.content, pointersParser.AssignContext):
-            print("get Text info:",block.content.variable(0))
-            print("get Text info:",block.content.variable(0).getText())
-            print("get Text info:",block.content.variable(1).getText())
+##            print("get Text info:",block.content.variable(0))
+##            print("get Text info:",block.content.variable(0).getText())
+##            print("get Text info:",block.content.variable(1).getText())
             # To access the name of the assigned variable you can use block.content.variable(0).getText()
             if not isinstance(block.content.variable(1), pointersParser.NullvarContext):
                 nextState = currentState.copy()
@@ -255,6 +255,7 @@ class PointersDomain():
                 var2Name = block.content.variable(1).getText()
                 
                 nextState[var1Name] = nextState[var2Name]
+                print("   **var:=var,",nextState)
                 return nextState
             else:
                 # what need to be done if the variable is assigned null
@@ -262,17 +263,19 @@ class PointersDomain():
                 var1Name = block.content.variable(0).getText()
                 #???
                 nextState[var1Name] = PointersDomain.topElement
+                print("   **var:=null,",nextState)
                 return nextState
         elif isinstance(block.content, pointersParser.AllocContext):
             # how to handle the newObject statement
             # use block.bbid to access the block id of the current CFG node
             # use block.content.variable().getText() to access the variable being assigned
             nextState = currentState.copy()
-            print("Pos1:", nextState, block.content.variable().getText())
-            print("Pos1:", nextState, block.content.variable())
+##            print("Pos1:", nextState, block.content.variable().getText())
+##            print("Pos1:", nextState, block.content.variable())
             var1Name = block.content.variable().getText()
-            print("Pos1:", nextState, var1Name)
+##            print("Pos1:", nextState, var1Name)
             nextState[var1Name] = PointersDomain.topElement
+            print("   **Alloc,",nextState)
             return nextState
         else:
             # For split nodes in the CFG we will be adding join nodes. Those nodes do not change the state
@@ -288,6 +291,7 @@ class PointersDomain():
             nextState[k] = PointersDomain.lub(abstractState1[k], abstractState2[k])
         for k in abstractState2.keys():
             nextState[k] = PointersDomain.lub(abstractState1[k], abstractState2[k])
+        print("   **merge,",nextState)
         return nextState
 
 if __name__ == '__main__':
