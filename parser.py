@@ -245,6 +245,9 @@ class PointersDomain():
             # what needs to happen if it is a skip statement
             return currentState
         elif isinstance(block.content, pointersParser.AssignContext):
+            print("get Text info:",block.content.variable(0))
+            print("get Text info:",block.content.variable(0).getText())
+            print("get Text info:",block.content.variable(1).getText())
             # To access the name of the assigned variable you can use block.content.variable(0).getText()
             if not isinstance(block.content.variable(1), pointersParser.NullvarContext):
                 nextState = currentState.copy()
@@ -266,6 +269,7 @@ class PointersDomain():
             # use block.content.variable().getText() to access the variable being assigned
             nextState = currentState.copy()
             var1Name = block.content.variable(0).getText()
+            print("Pos1:", nextState, var1Name)
             nextState[var1Name] = PointersDomain.topElement
             return newAbstractState
         else:
