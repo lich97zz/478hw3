@@ -273,7 +273,7 @@ class PointersDomain():
             var1Name = block.content.variable().getText()
             print("Pos1:", nextState, var1Name)
             nextState[var1Name] = PointersDomain.topElement
-            return newAbstractState
+            return nextState
         else:
             # For split nodes in the CFG we will be adding join nodes. Those nodes do not change the state
             return currentState
