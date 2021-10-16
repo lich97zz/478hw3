@@ -268,8 +268,10 @@ class PointersDomain():
             # use block.bbid to access the block id of the current CFG node
             # use block.content.variable().getText() to access the variable being assigned
             nextState = currentState.copy()
+            print("Pos1:", nextState, block.content.variable().getText())
+            print("Pos1:", nextState, block.content.variable())
+            var1Name = block.content.variable().getText()
             print("Pos1:", nextState, var1Name)
-            var1Name = block.content.variable(0).getText()
             nextState[var1Name] = PointersDomain.topElement
             return newAbstractState
         else:
