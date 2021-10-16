@@ -274,7 +274,7 @@ class PointersDomain():
 ##            print("Pos1:", nextState, block.content.variable())
             var1Name = block.content.variable().getText()
 ##            print("Pos1:", nextState, var1Name)
-            nextState[var1Name] = PointersDomain.topElement
+            nextState[var1Name] = set([block.bbid])
             print("   **Alloc,",nextState)
             return nextState
         else:
@@ -290,7 +290,8 @@ class PointersDomain():
         for k in abstractState1.keys():
             nextState[k] = PointersDomain.lub(abstractState1[k], abstractState2[k])
         for k in abstractState2.keys():
-            nextState[k] = PointersDomain.lub(abstractState1[k], abstractState2[k])
+            if k not in nextState:
+                nextState[k] = PointersDomain.lub(abstractState1[k], abstractState2[k])
         print("   **merge,",nextState)
         return nextState
 
