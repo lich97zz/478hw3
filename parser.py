@@ -44,7 +44,7 @@ class CFG:
     
     def processSingleStatement(statement, prevNode, bbid):
         if (isinstance(statement, pointersParser.AssignContext) or
-            isinstance(statement, pointersParser.MallocContext) or
+            isinstance(statement, pointersParser.AllocContext) or
             isinstance(statement, pointersParser.SkipContext)):
             newBlock = CFGNode(statement, statement.getText(), False, bbid+1)
             if prevNode:
@@ -260,7 +260,7 @@ class PointersDomain():
                 nextState[var1Name] = PointersDomain.topElement
 ##                print("   **var:=null,",nextState)
                 return nextState
-        elif isinstance(block.content, pointersParser.MallocContext):
+        elif isinstance(block.content, pointersParser.AllocContext):
             # how to handle the newObject statement
             # use block.bbid to access the block id of the current CFG node
             # use block.content.variable().getText() to access the variable being assigned

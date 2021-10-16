@@ -43,6 +43,9 @@ class CFG:
 
     
     def processSingleStatement(statement, prevNode, bbid):
+        for attr in dir(pointersParser):
+            print("pointersParser.%s = %r" % (attr, getattr(pointersParser, attr)))
+            
         if (isinstance(statement, pointersParser.AssignContext) or
             isinstance(statement, pointersParser.AllocContext) or
             isinstance(statement, pointersParser.SkipContext)):
