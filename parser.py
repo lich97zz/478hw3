@@ -218,9 +218,9 @@ class PointersDomain():
             return PointersDomain.topElement
         res = set()
         for i in a:
-            res.insert(i)
+            res.add(i)
         for i in b:
-            res.insert(i)
+            res.add(i)
         return res
 
     # Checks if two abstract states are the same
