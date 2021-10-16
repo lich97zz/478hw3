@@ -137,7 +137,7 @@ class CFG:
             else:
                 return statementList + [node]
             
-class ConstDomain(AbstractDomain):
+class ConstDomain():
     ###
     topElement = "Top"
     bottomElement = "Bot"
