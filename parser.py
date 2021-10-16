@@ -210,11 +210,32 @@ class PointersDomain():
     # We have already defined the bottom element to be the empty set and the top element to be a set with ['null']
     # Elements of the abstractDomain are sets of object allocation sites
     def lub(a, b):
-        return []
+        if a==PointersDomain.bottomElement:
+            return b
+        if b==PointersDomain.bottomElement:
+            return a
+        if a==PointersDomain.topElement or b==PointersDomain.topElement:
+            return topElement
+        res = set()
+        for i in a:
+            res.insert(i)
+        for i in b:
+            res.insert(i)
+        return res
 
     # Checks if two abstract states are the same
     # Remember that the abstract states map each variable to a element in the abstract domain
     def isEqual(state1, state2):
+        for k in state1.keys():
+            if k not in state2:
+                return False
+            if state1[k] != state2[k]:
+                return False
+        for k in state2.keys():
+            if k not in state1:
+                return False
+            if state2[k] != state1[k]:
+                return False
         return True
 
     # This is the main tranfer function that need to be implemented.
@@ -222,20 +243,31 @@ class PointersDomain():
     def statementTransfer(block, currentState, nextAbstractState):
         if isinstance(block.content, pointersParser.SkipContext):
             # what needs to happen if it is a skip statement
-            return []
+            return currentState
         elif isinstance(block.content, pointersParser.AssignContext):
             # To access the name of the assigned variable you can use block.content.variable(0).getText()
             if not isinstance(block.content.variable(1), pointersParser.NullvarContext):
-                # what need to be done if the variable is assigned another variable
-                return []
+                nextState = currentState.copy()
+                var1Name = block.content.variable(0).getText()
+                var2Name = block.content.variable(1).getText()
+                
+                nextState[var1Name] = nextState[var2Name]
+                return nextState
             else:
-                # what need to be done if the variable is assigned null                
-                return []
+                # what need to be done if the variable is assigned null
+                nextState = currentState.copy()
+                var1Name = block.content.variable(0).getText()
+                #???
+                nextState[var1Name] = PointersDomain.topElement
+                return nextState
         elif isinstance(block.content, pointersParser.AllocContext):
             # how to handle the newObject statement
             # use block.bbid to access the block id of the current CFG node
             # use block.content.variable().getText() to access the variable being assigned
-            pass
+            nextState = currentState.copy()
+            var1Name = block.content.variable(0).getText()
+            nextState[var1Name] = PointersDomain.topElement
+            return newAbstractState
         else:
             # For split nodes in the CFG we will be adding join nodes. Those nodes do not change the state
             return currentState
@@ -245,7 +277,12 @@ class PointersDomain():
     # hint use the PointersDomain.lub function
     def merge(abstractState1, abstractState2):
         # Replace the return statement. This is currently here to prevent the program crashing. 
-        return abstractState1
+        nextState = {}
+        for k in abstractState1.keys():
+            nextState[k] = PointersDomain.lub(abstractState1[k], abstractState2[k])
+        for k in abstractState2.keys():
+            nextState[k] = PointersDomain.lub(abstractState1[k], abstractState2[k])
+        return nextState
 
 if __name__ == '__main__':
     input_file = sys.argv[1]
