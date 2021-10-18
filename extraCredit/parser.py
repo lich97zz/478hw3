@@ -190,23 +190,25 @@ class IntervalDomain():
         lhs = IntervalDomain.absEvalExpression(expression.expression(0), abstractState)
         rhs = IntervalDomain.absEvalExpression(expression.expression(1), abstractState)
         print("info:",opr)
-        print(lhs)
-        print(rhs)
-        lhsMin = lhs[0]
-        rhsMin = rhs[0]
-        lhsMax = lhs[1]
-        rhsMax = rhs[1]
+        print("lhs:",lhs)
+        print("rhs:",rhs)
+##        lhsMin = lhs[0]
+##        rhsMin = rhs[0]
+##        lhsMax = lhs[1]
+##        rhsMax = rhs[1]
 
         resMin = "-inf"
         resMax = "inf"
 
-        if lhs == IntervalDomain.topElement and rhs == IntervalDomain.topElement:
+        if lhs == IntervalDomain.topElement or rhs == IntervalDomain.topElement:
             return IntervalDomain.topElement
-        if lhsMax != "inf" and rhsMax != "inf":
-            resMax = opr(lhsMax, rhsMax)
-        if lhsMin != "-inf" and rhsMin != "-inf":
-            resMin = opr(lhsMin, rhsMin)
-        return (lhs, rhs)    
+        if lhs == "inf" or rhs == "inf":
+            return "inf"
+        elif lhs == "-inf" or rhs == "-inf":
+            return "-inf"
+##        if lhsMin != "-inf" and rhsMin != "-inf":
+##            resMin = opr(lhsMin, rhsMin)
+        return opr(lhs, rhs)    
 
     def absEvalExpression(expression, abstractState):
         if isinstance(expression, pointersParser.LiteralContext):
