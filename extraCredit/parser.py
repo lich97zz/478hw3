@@ -44,7 +44,6 @@ class CFG:
     
     def processSingleStatement(statement, prevNode, bbid):
         if (isinstance(statement, pointersParser.AssignContext) or
-            isinstance(statement, pointersParser.AllocContext) or
             isinstance(statement, pointersParser.SkipContext)):
             newBlock = CFGNode(statement, statement.getText(), False, bbid+1)
             if prevNode:
@@ -168,11 +167,11 @@ class PointersDomain():
             else:
                 # what need to be done if the variable is assigned null                
                 return []
-        elif isinstance(block.content, pointersParser.AllocContext):
-            # how to handle the newObject statement
-            # use block.bbid to access the block id of the current CFG node
-            # use block.content.variable().getText() to access the variable being assigned
-            pass
+##        elif isinstance(block.content, pointersParser.AllocContext):
+##            # how to handle the newObject statement
+##            # use block.bbid to access the block id of the current CFG node
+##            # use block.content.variable().getText() to access the variable being assigned
+##            pass
         else:
             # For split nodes in the CFG we will be adding join nodes. Those nodes do not change the state
             return currentState
