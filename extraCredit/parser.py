@@ -189,6 +189,9 @@ class IntervalDomain():
     def handleBinaryExpression(expression, abstractState, opr):
         lhs = IntervalDomain.absEvalExpression(expression.expression(0), abstractState)
         rhs = IntervalDomain.absEvalExpression(expression.expression(1), abstractState)
+        print("info:",opr)
+        print(lhs)
+        print(rhs)
         lhsMin = lhs[0]
         rhsMin = rhs[0]
         lhsMax = lhs[1]
