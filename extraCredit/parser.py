@@ -190,8 +190,8 @@ class IntervalDomain():
         lhs = IntervalDomain.absEvalExpression(expression.expression(0), abstractState)
         rhs = IntervalDomain.absEvalExpression(expression.expression(1), abstractState)
 ##        print("info:",opr)
-        print("lhs:",lhs)
-        print("rhs:",rhs)
+##        print("lhs:",lhs)
+##        print("rhs:",rhs)
         lhsMin = lhs[0]
         rhsMin = rhs[0]
         lhsMax = lhs[1]
