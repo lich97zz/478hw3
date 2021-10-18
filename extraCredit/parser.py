@@ -189,30 +189,30 @@ class IntervalDomain():
     def handleBinaryExpression(expression, abstractState, opr):
         lhs = IntervalDomain.absEvalExpression(expression.expression(0), abstractState)
         rhs = IntervalDomain.absEvalExpression(expression.expression(1), abstractState)
-        print("info:",opr)
+##        print("info:",opr)
         print("lhs:",lhs)
         print("rhs:",rhs)
-##        lhsMin = lhs[0]
-##        rhsMin = rhs[0]
-##        lhsMax = lhs[1]
-##        rhsMax = rhs[1]
+        lhsMin = lhs[0]
+        rhsMin = rhs[0]
+        lhsMax = lhs[1]
+        rhsMax = rhs[1]
 
         resMin = "-inf"
         resMax = "inf"
 
         if lhs == IntervalDomain.topElement or rhs == IntervalDomain.topElement:
             return IntervalDomain.topElement
-        if lhs == "inf" or rhs == "inf":
-            return "inf"
-        elif lhs == "-inf" or rhs == "-inf":
-            return "-inf"
+        if lhsMax != "inf" and rhsMax != "inf":
+            resMax = opr(lhsMax, rhsMax)
+        if lhsMin != "-inf" and rhsMin != "-inf":
+            resMin = opr(lhsMin, rhsMin)
 ##        if lhsMin != "-inf" and rhsMin != "-inf":
 ##            resMin = opr(lhsMin, rhsMin)
-        return opr(lhs, rhs)    
+        return (resMin, resMax)  
 
     def absEvalExpression(expression, abstractState):
         if isinstance(expression, pointersParser.LiteralContext):
-            return int(expression.getText())
+            return [int(expression.getText()), int(expression.getText())]
         if isinstance(expression, pointersParser.VariableExprContext):
             return abstractState[expression.getText()]
         if isinstance(expression, pointersParser.ParanContext):
