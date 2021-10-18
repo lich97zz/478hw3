@@ -153,9 +153,9 @@ class CFG:
                 return statementList + [node]
 
 
-class PointersDomain():
-    topElement = set(['null'])
-    bottomElement = set([])
+class IntervalDomain():
+    topElement = ["null"]
+    bottomElement = ["-inf", "inf"]
 
     # Returns the least upper bound given two elements (join operator)
     # Implement the latice for Allocation sites here.
@@ -283,7 +283,7 @@ if __name__ == '__main__':
     CFG.drawCFG(cfg.startNode)
     print('--------------')
 
-    absInterp = AbstractInterpretation(ast, cfg, PointersDomain)
+    absInterp = AbstractInterpretation(ast, cfg, IntervalDomain)
     absInterp.run()
     absInterp.printAbsState()
     print('--------------')
