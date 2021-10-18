@@ -295,6 +295,11 @@ if __name__ == '__main__':
     lexer = pointersLexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = pointersParser(stream)
+    
+    for attr in dir(parser):
+        if "Context" in attr:
+            print("obj.%s = %r" % (attr, getattr(parser, attr)))
+
     ast = parser.program()
     cfg = CFG(ast)
 
