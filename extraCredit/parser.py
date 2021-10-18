@@ -73,6 +73,7 @@ class CFG:
             return bbid+1, newBlock, endNode2
 
         if isinstance(statement, pointersParser.AddContext):
+            print("!!!!!!!!!!!!!!!!!!!!")
             for attr in dir(statement):
                 print("obj.%s = %r" % (attr, getattr(statement, attr)))
             newBlock = CFGNode(statement.cond, "While [{}]".format(statement.cond.getText()), True, bbid+1)
@@ -271,7 +272,8 @@ if __name__ == '__main__':
     for attr in dir(parser):
         if "Context" in attr:
             print("obj.%s = %r" % (attr, getattr(parser, attr)))
-        
+    print("end************")
+    
     ast = parser.program()
     cfg = CFG(ast)
 
