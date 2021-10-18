@@ -1,0 +1,14 @@
+strict digraph "" {
+	"[Id: 0]: Start" -> "[Id: 1]: While [T]";
+	"[Id: 1]: While [T]" -> "[Id: 2]: IF: [(T)]";
+	"[Id: 1]: While [T]" -> "[Id: 7]: skip";
+	"[Id: 2]: IF: [(T)]" -> "[Id: 3]: x=newObject";
+	"[Id: 2]: IF: [(T)]" -> "[Id: 4]: x=newObject";
+	"[Id: 3]: x=newObject" -> "[Id: 5]: Join";
+	"[Id: 5]: Join" -> "[Id: 6]: y=x";
+	"[Id: 6]: y=x" -> "[Id: 1]: While [T]";
+	"[Id: 4]: x=newObject" -> "[Id: 5]: Join";
+	"[Id: 7]: skip" -> "[Id: 8]: x=newObject";
+	"[Id: 8]: x=newObject" -> "[Id: 9]: y=null";
+	"[Id: 9]: y=null" -> "[Id: 10]: End";
+}
