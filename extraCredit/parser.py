@@ -173,7 +173,7 @@ class IntervalDomain():
             return a
         if a==IntervalDomain.topElement or b==IntervalDomain.topElement:
             return IntervalDomain.topElement
-        return [minElm(a[0],b[0]), maxElm(a[1],b[1])]
+        return [IntervalDomain.minElm(a[0],b[0]), IntervalDomain.maxElm(a[1],b[1])]
 
     # Checks if two abstract states are the same
     # Remember that the abstract states map each variable to a element in the abstract domain
