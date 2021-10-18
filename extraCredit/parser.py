@@ -72,6 +72,18 @@ class CFG:
             newBlock.setBranches(truebranch, endNode2)
             return bbid+1, newBlock, endNode2
 
+        if isinstance(statement, pointersParser.AddContext):
+            for attr in dir(statement):
+                print("obj.%s = %r" % (attr, getattr(statement, attr)))
+            newBlock = CFGNode(statement.cond, "While [{}]".format(statement.cond.getText()), True, bbid+1)
+            if prevNode:
+                prevNode.setNextBlock(newBlock)            
+            bbid, truebranch, endNode1 =  CFG.buildCFG(statement.statement(), None, bbid+1)
+            endNode2 =  CFGNode(None, 'skip', False, bbid+1)
+            endNode1.setNextBlock(newBlock)            
+            newBlock.setBranches(truebranch, endNode2)
+            return bbid+1, newBlock, endNode2
+        
         print("[Warning] Not defined statement: ", type(statement))
         return bbid, prevNode, prevNode
         
