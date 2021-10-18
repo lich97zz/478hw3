@@ -45,12 +45,14 @@ class CFG:
     def processSingleStatement(statement, prevNode, bbid):
         if (isinstance(statement, pointersParser.AssignContext) or
             isinstance(statement, pointersParser.SkipContext)):
+            print("Enter an assign, ", bbid)
             newBlock = CFGNode(statement, statement.getText(), False, bbid+1)
             if prevNode:
                 prevNode.setNextBlock(newBlock)
             return bbid+1, newBlock, newBlock
         
         if isinstance(statement, pointersParser.IfContext):
+            print("Enter a if, ", bbid)
             newBlock = CFGNode(None, "IF: [{}]".format(statement.cond.getText()), True, bbid + 1)
             bbid, ifbranch, endNode1 =  CFG.buildCFG(statement.ifs, None, bbid + 1)
             bbid, elsebranch, endNode2 =  CFG.buildCFG(statement.elses, None, bbid)
@@ -63,6 +65,7 @@ class CFG:
             return bbid + 1, newBlock, joinNode
         
         if isinstance(statement, pointersParser.WhileContext):
+            print("Enter a while, ", bbid)
             newBlock = CFGNode(statement.cond, "While [{}]".format(statement.cond.getText()), True, bbid+1)
             if prevNode:
                 prevNode.setNextBlock(newBlock)            
