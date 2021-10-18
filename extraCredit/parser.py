@@ -74,19 +74,6 @@ class CFG:
             endNode1.setNextBlock(newBlock)            
             newBlock.setBranches(truebranch, endNode2)
             return bbid+1, newBlock, endNode2
-
-        if isinstance(statement, pointersParser.AddContext):
-            print("!!!!!!!!!!!!!!!!!!!!")
-            for attr in dir(statement):
-                print("obj.%s = %r" % (attr, getattr(statement, attr)))
-            newBlock = CFGNode(statement.cond, "While [{}]".format(statement.cond.getText()), True, bbid+1)
-            if prevNode:
-                prevNode.setNextBlock(newBlock)            
-            bbid, truebranch, endNode1 =  CFG.buildCFG(statement.statement(), None, bbid+1)
-            endNode2 =  CFGNode(None, 'skip', False, bbid+1)
-            endNode1.setNextBlock(newBlock)            
-            newBlock.setBranches(truebranch, endNode2)
-            return bbid+1, newBlock, endNode2
         
         print("[Warning] Not defined statement: ", type(statement))
         return bbid, prevNode, prevNode
@@ -157,33 +144,94 @@ class IntervalDomain():
     topElement = ["null"]
     bottomElement = ["-inf", "inf"]
 
+    def minElm(a,b):
+        if a=="-inf" or b=="-inf":
+            return "-inf"
+        if a=="inf":
+            return b
+        if b=="inf":
+            return a
+        return min(a,b)
+    
+    def maxElm(a,b):
+        if a=="inf" or b=="inf":
+            return "inf"
+        if a=="-inf":
+            return b
+        if b=="-inf":
+            return a
+        return max(a,b)
+    
     # Returns the least upper bound given two elements (join operator)
     # Implement the latice for Allocation sites here.
     # We have already defined the bottom element to be the empty set and the top element to be a set with ['null']
     # Elements of the abstractDomain are sets of object allocation sites
     def lub(a, b):
-        return []
+        if a==IntervalDomain.bottomElement:
+            return b
+        if b==IntervalDomain.bottomElement:
+            return a
+        if a==IntervalDomain.topElement or b==IntervalDomain.topElement:
+            return IntervalDomain.topElement
+        return [minElm(a[0],b[0]), maxElm(a[1],b[1])]
 
     # Checks if two abstract states are the same
     # Remember that the abstract states map each variable to a element in the abstract domain
     def isEqual(state1, state2):
+        for k in state1.keys():
+            if state1[k] != state2[k]:
+                return False
+        for k in state2.keys():
+            if state1[k] != state2[k]:
+                return False
         return True
+    
+    def handleBinaryExpression(expression, abstractState, opr):
+        lhs = IntervalDomain.absEvalExpression(expression.expression(0), abstractState)
+        rhs = IntervalDomain.absEvalExpression(expression.expression(1), abstractState)
+        lhsMin = lhs[0]
+        rhsMin = rhs[0]
+        lhsMax = lhs[1]
+        rhsMax = rhs[1]
+
+        resMin = "-inf"
+        resMax = "inf"
+
+        if lhs == IntervalDomain.topElement and rhs == IntervalDomain.topElement:
+            return IntervalDomain.topElement
+        if lhsMax != "inf" and rhsMax != "inf":
+            resMax = opr(lhsMax, rhsMax)
+        if lhsMin != "-inf" and rhsMin != "-inf":
+            resMin = opr(lhsMin, rhsMin)
+        return (lhs, rhs)    
+
+    def absEvalExpression(expression, abstractState):
+        if isinstance(expression, pointersParser.LiteralContext):
+            return int(expression.getText())
+        if isinstance(expression, pointersParser.VariableExprContext):
+            return abstractState[expression.getText()]
+        if isinstance(expression, pointersParser.ParanContext):
+            return IntervalDomain.absEvalExpression(expression.expression(), abstractState)
+        if isinstance(expression, pointersParser.MultiplyContext):
+            return IntervalDomain.handleBinaryExpression(expression, abstractState, operator.mul)
+        if isinstance(expression, pointersParser.DivideContext):
+            return IntervalDomain.handleBinaryExpression(expression, abstractState, operator.div) 
+        if isinstance(expression, pointersParser.AddContext):
+            return IntervalDomain.handleBinaryExpression(expression, abstractState, operator.add)
+        if isinstance(expression, pointersParser.MinusContext):
+            return IntervalDomain.handleBinaryExpression(expression, abstractState, operator.sub)
 
     # This is the main tranfer function that need to be implemented.
     # For each type of statement define how the currentState get transformed and return the updated state.
     def statementTransfer(block, currentState, nextAbstractState):
         if isinstance(block.content, pointersParser.SkipContext):
             # what needs to happen if it is a skip statement
-            return []
+            return currentState
         elif isinstance(block.content, pointersParser.AssignContext):
-            return []
-            # To access the name of the assigned variable you can use block.content.variable(0).getText()
-            if not isinstance(block.content.variable(1), pointersParser.NullvarContext):
-                # what need to be done if the variable is assigned another variable
-                return []
-            else:
-                # what need to be done if the variable is assigned null                
-                return []
+            nextState = currentState.copy()
+            value = IntervalDomain.absEvalExpression(block.content.expression(), currentState)
+            nextState[block.content.variable().getText()] = value
+            return nextState
         else:
             # For split nodes in the CFG we will be adding join nodes. Those nodes do not change the state
             return currentState
@@ -193,7 +241,10 @@ class IntervalDomain():
     # hint use the PointersDomain.lub function
     def merge(abstractState1, abstractState2):
         # Replace the return statement. This is currently here to prevent the program crashing. 
-        return abstractState1
+        nextState = {}
+        for k in abstractState1.keys():
+            nextState[k] = IntervalDomain.lub(abstractState1[k], abstractState2[k])
+        return nextState
             
 
 class AbstractInterpretation():
